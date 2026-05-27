@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 import { isSignedIn } from "@/services/googleAuth";
 import {
-  ensureSheetsExist, readSheetRows, appendRow, findRowIndex, updateRow, deleteRow,
+  ensureSheetsExist, readSheetRows, appendRow, findRowIndex, updateRow, deleteRow, loadAllData,
   TABS, TAB_HEADERS, serializeRow, deserializeRow, uploadToProjectFolder,
 } from "@/services/sheetsDataService";
 
@@ -361,36 +361,7 @@ const AppContext = createContext<AppContextType | null>(null);
 
 const STORAGE_KEY = "dr_app_data_web_v3";
 
-const DEFAULT_EQUIPMENT: Equipment[] = [
-  { id: "e1", name: "Navvis VLX3", type: "Mobile LiDAR Scanner", status: "In Use", assignedTo: "Roshan Singh", serialNumber: "G11-0070", quantity: 1, location: "Vizag" },
-  { id: "e2", name: "Navvis M6", type: "Mobile Mapping System", status: "In Use", assignedTo: "Roshan Singh", serialNumber: "TK2-M3-8-004", quantity: 1, location: "Vizag" },
-  { id: "e3", name: "Apple Ipad", type: "Tablet", status: "In Use", assignedTo: "Parag Sir", serialNumber: "DMPPD52BG5VN", quantity: 1, location: "HYD" },
-  { id: "e4", name: "Matterport Pro2", type: "3D Camera", status: "In Use", assignedTo: "Parag Sir", serialNumber: "M02HCD7M", quantity: 1, location: "HYD" },
-  { id: "e5", name: "Matterport", type: "3D Camera", status: "In Use", assignedTo: "Parag Sir", serialNumber: "MC200", quantity: 1, location: "HYD" },
-  { id: "e6", name: "Cannon Mark 200D", type: "DSLR Camera", status: "In Use", assignedTo: "Tarun", serialNumber: "DS126762", quantity: 1, location: "Vizag" },
-  { id: "e7", name: "Big Tripod", type: "Tripod", status: "In Use", assignedTo: "Parag Sir", serialNumber: "NA", quantity: 1, location: "HYD" },
-  { id: "e8", name: "Small Tripod (Camera)", type: "Tripod", status: "In Use", assignedTo: "Tarun", serialNumber: "VCT-R640", quantity: 1, location: "Vizag" },
-  { id: "e9", name: "Garmin VIRB 360", type: "360 Camera", status: "In Use", assignedTo: "Roshan Singh", serialNumber: "57J007546", quantity: 1, location: "Vizag" },
-  { id: "e10", name: "DJI Handy Cam (1 charger + 2 batteries)", type: "Action Camera", status: "In Use", assignedTo: "Roshan Singh", serialNumber: "06NDCJI20A00VF", quantity: 1, location: "Vizag" },
-  { id: "e11", name: "Contour2+", type: "Action Camera", status: "In Use", assignedTo: "Roshan Singh", serialNumber: "2050600653", quantity: 1, location: "Vizag" },
-  { id: "e12", name: "Stereo Lab ZED 2", type: "Depth Camera", status: "In Use", assignedTo: "Vijay Kesiraju", serialNumber: "19200", quantity: 1, location: "HYD" },
-  { id: "e13", name: "Sensefly eBee (Fixed Wing Drone)", type: "Drone", status: "Maintenance", assignedTo: "", serialNumber: "Damaged", quantity: 1, location: "Confirmed by Siddarth sir" },
-  { id: "e14", name: "Quantum Trinity F90 (Fixed-Wing VTOL)", type: "Drone", status: "In Use", assignedTo: "", serialNumber: "Mumbai", quantity: 1, location: "Confirmed by Siddarth sir" },
-  { id: "e15", name: "DJI Phantom Pro4 V2", type: "Drone", status: "Maintenance", assignedTo: "Roshan Singh", serialNumber: "Damaged", quantity: 1, location: "Vizag Office" },
-  { id: "e16", name: "Laptop", type: "Computer", status: "In Use", assignedTo: "Roshan Singh", serialNumber: "", quantity: 1, location: "Vizag" },
-  { id: "e17", name: "Hard Disk", type: "Storage", status: "In Use", assignedTo: "Roshan Singh", serialNumber: "4 TB", quantity: 1, location: "Vizag" },
-  { id: "e18", name: "Mouse", type: "Accessory", status: "In Use", assignedTo: "Roshan Singh", serialNumber: "", quantity: 1, location: "Vizag" },
-  { id: "e19", name: "Shoes", type: "Safety Gear", status: "In Use", assignedTo: "Roshan Singh", serialNumber: "", quantity: 7, location: "Vizag" },
-  { id: "e20", name: "Safety Jacket", type: "Safety Gear", status: "In Use", assignedTo: "Roshan Singh", serialNumber: "", quantity: 10, location: "Vizag" },
-  { id: "e21", name: "Safety Helmet", type: "Safety Gear", status: "In Use", assignedTo: "Roshan Singh", serialNumber: "", quantity: 10, location: "Vizag" },
-  { id: "e22", name: "Structure Sensor", type: "3D Scanner", status: "Available", assignedTo: "", serialNumber: "36608", quantity: 1, location: "" },
-  { id: "e23", name: "Project Tango Dev Kit Only Tab", type: "Tablet", status: "In Use", assignedTo: "Roshan Singh", serialNumber: "NX-74751", quantity: 1, location: "Vizag" },
-  { id: "e24", name: "Digital Lux Meter", type: "Measurement Tool", status: "In Use", assignedTo: "Roshan Singh", serialNumber: "DC-9V", quantity: 1, location: "Vizag" },
-  { id: "e25", name: "Disto D410", type: "Laser Distance Meter", status: "In Use", assignedTo: "Roshan Singh", serialNumber: "1050920891", quantity: 1, location: "Vizag" },
-  { id: "e26", name: "Walkie Talkie", type: "Communication", status: "In Use", assignedTo: "Roshan Singh", serialNumber: "P3BCF1404/P3BCF0270", quantity: 2, location: "Vizag" },
-  { id: "e27", name: "Insta 360 X5 & Selfie Stick", type: "360 Camera", status: "In Use", assignedTo: "Roshan Singh", serialNumber: "IAHEA2505E455F", quantity: 1, location: "Vizag" },
-  { id: "e28", name: "Gimbal Mozo", type: "Camera Gimbal", status: "In Use", assignedTo: "Roshan Singh", serialNumber: "2AMJRAIRCROSS-S", quantity: 1, location: "Vizag" },
-];
+
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState>({
@@ -435,46 +406,75 @@ export function AppProvider({ children }: { children: ReactNode }) {
           }
           setState((prev) => ({ ...prev, ...parsed }));
         } catch {}
-      } else {
-        // Seed default equipment on fresh load
-        setState((prev) => ({ ...prev, equipment: DEFAULT_EQUIPMENT }));
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ equipment: DEFAULT_EQUIPMENT }));
       }
 
       // Then try to load from Google Sheets (if signed in)
       if (isSignedIn()) {
         try {
           await ensureSheetsExist();
+          const sheetData = await loadAllData();
+          const headers = TAB_HEADERS;
+
+          // Load Projects
           {
-            const raw = await readSheetRows(TABS.PROJECTS as any);
+            const raw = sheetData[TABS.PROJECTS] || [];
             if (raw.length > 0) {
-              const headers = TAB_HEADERS[TABS.PROJECTS];
-              const projects: Project[] = raw.map((r) => deserializeRow<Project>(headers, r));
+              const projects: Project[] = raw.map((r: string[]) => deserializeRow<Project>(headers[TABS.PROJECTS], r));
               setState((prev) => ({ ...prev, projects }));
-              localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"), projects }));
             }
           }
+
+          // Load Equipment
           {
-            const raw = await readSheetRows(TABS.USERS as any);
-            const headers = TAB_HEADERS[TABS.USERS];
-            const users = raw
-              .filter((r) => r[headers.indexOf("id")] && r[headers.indexOf("name")] && r[headers.indexOf("email")])
-              .map((r) => {
-                const email = r[headers.indexOf("email")] || "";
-                const role = r[headers.indexOf("role")] || "";
-                return {
-                  id: r[headers.indexOf("id")] || "",
-                  name: r[headers.indexOf("name")] || "",
-                  email,
-                  role,
-                  isApproved: r[headers.indexOf("isApproved")] === "TRUE" || r[headers.indexOf("isApproved")] === "true",
-                  isAdmin: role.toLowerCase() === "admin",
-                  googleId: r[headers.indexOf("googleId")] || undefined,
-                  projectAssigned: r[headers.indexOf("projectAssigned")] || undefined,
-                } as User;
-              });
-            setState((prev) => ({ ...prev, users }));
-            localStorage.setItem("dr_users_cache", JSON.stringify(users));
+            const raw = sheetData[TABS.EQUIPMENT] || [];
+            if (raw.length > 0) {
+              const equipment: Equipment[] = raw
+                .filter((r: string[]) => r[headers[TABS.EQUIPMENT].indexOf("id")])
+                .map((r: string[]) => {
+                  const h = headers[TABS.EQUIPMENT];
+                  const get = (key: string) => {
+                    const idx = h.indexOf(key);
+                    return idx >= 0 ? r[idx] || "" : "";
+                  };
+                  return {
+                    id: get("id"),
+                    name: get("name"),
+                    type: get("type"),
+                    status: get("status") as EquipmentStatus,
+                    assignedTo: get("assignedTo"),
+                    serialNumber: get("serialNumber") || undefined,
+                    quantity: Number(get("quantity")) || 1,
+                    location: get("location") || undefined,
+                  } as Equipment;
+                });
+              setState((prev) => ({ ...prev, equipment }));
+            }
+          }
+
+          // Load Users
+          {
+            const raw = sheetData[TABS.USERS] || [];
+            if (raw.length > 0) {
+              const h = headers[TABS.USERS];
+              const users: User[] = raw
+                .filter((r: string[]) => r[h.indexOf("id")] && r[h.indexOf("name")] && r[h.indexOf("email")])
+                .map((r: string[]) => {
+                  const email = r[h.indexOf("email")] || "";
+                  const role = r[h.indexOf("role")] || "";
+                  return {
+                    id: r[h.indexOf("id")] || "",
+                    name: r[h.indexOf("name")] || "",
+                    email,
+                    role,
+                    isApproved: r[h.indexOf("isApproved")] === "TRUE" || r[h.indexOf("isApproved")] === "true",
+                    isAdmin: role.toLowerCase() === "admin",
+                    googleId: r[h.indexOf("googleId")] || undefined,
+                    projectAssigned: r[h.indexOf("projectAssigned")] || undefined,
+                  } as User;
+                });
+              setState((prev) => ({ ...prev, users }));
+              localStorage.setItem("dr_users_cache", JSON.stringify(users));
+            }
           }
         } catch (err) {
           console.warn("Failed to load data from sheets:", err);
