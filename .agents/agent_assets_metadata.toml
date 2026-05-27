@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "eR5JEf2izKl8kfHGPZUHb"
+uri = "file://artifacts/digital-reality/assets/images/icon.png"
+type = "image"
+title = "generated_image"

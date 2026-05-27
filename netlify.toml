@@ -3,9 +3,7 @@
   publish = "artifacts/digital-reality-web/dist/public"
 
 [build.environment]
-  NODE_VERSION = "20"
-  PORT = "3000"
-  BASE_PATH = "/"
+  NODE_VERSION = "22"
 
 [[redirects]]
   from = "/*"

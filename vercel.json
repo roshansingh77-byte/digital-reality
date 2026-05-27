@@ -1,0 +1,8 @@
+{
+  "buildCommand": "pnpm --filter @workspace/digital-reality-web run build",
+  "outputDirectory": "artifacts/digital-reality-web/dist/public",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "framework": null
+}
