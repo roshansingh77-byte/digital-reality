@@ -1,0 +1,13 @@
+[build]
+  command = "pnpm --filter @workspace/digital-reality-web run build"
+  publish = "artifacts/digital-reality-web/dist/public"
+
+[build.environment]
+  NODE_VERSION = "20"
+  PORT = "3000"
+  BASE_PATH = "/"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

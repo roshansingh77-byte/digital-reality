@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/web/"
+title = "Digital Reality - Web Dashboard"
+version = "1.0.0"
+id = "artifacts/digital-reality-web"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/web/" ]
+localPort = 19972
+
+[services.development]
+run = "pnpm --filter @workspace/digital-reality-web run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/digital-reality-web", "run", "build" ]
+publicDir = "artifacts/digital-reality-web/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19972"
+BASE_PATH = "/web/"
